@@ -26,3 +26,31 @@ storage_options = {"User-Agent": "pyfixest-docs"}
 galton = pd.read_csv(dataverse + "10123762", sep=r"\s+", storage_options=storage_options)
 galton.head()
 ```
+
+## Fitting the Line by Hand
+
+The book computes the OLS line from five numbers: the two means, the two standard deviations, and the correlation. The slope is the correlation times the ratio of the standard deviations, and the line passes through the point of means.
+
+```{python}
+x = galton["midparentHeight"]
+y = galton["childHeight"]
+
+# center of the data
+center_x, center_y = x.mean(), y.mean()
+# standard deviations and correlation
+sd_x, sd_y = x.std(), y.std()
+rho_xy = x.corr(y)
+# OLS
+beta_fit = rho_xy * sd_y / sd_x
+alpha_fit = center_y - beta_fit * center_x
+alpha_fit, beta_fit
+```
+
+## The Same Line with PyFixest
+
+`pf.feols()` fits the same model from a formula. Its coefficients match the hand computation above and the values the book prints, 22.63624 and 0.6373609.
+
+```{python}
+fit = pf.feols("childHeight ~ midparentHeight", data=galton)
+fit.coef()
+```
