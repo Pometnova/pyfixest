@@ -45,7 +45,7 @@ rho_xy = x.corr(y)
 # OLS
 beta_fit = rho_xy * sd_y / sd_x
 alpha_fit = center_y - beta_fit * center_x
-alpha_fit, beta_fit
+print(f"intercept {alpha_fit:.6f}, slope {beta_fit:.6f}")
 ```
 
 ## The Same Line with PyFixest
