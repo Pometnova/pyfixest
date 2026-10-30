@@ -7,6 +7,8 @@ jupyter: python3
 In this notebook, we translate the R code for Chapter 2 of Peng Ding's open-access textbook [Linear Model and Extensions](https://arxiv.org/abs/2401.00649) to PyFixest. The book's R scripts and data sets are on the Harvard Dataverse ([doi:10.7910/DVN/DBDYVJ](https://doi.org/10.7910/DVN/DBDYVJ), CC0 1.0). Other chapters are tracked in [this GitHub issue](https://github.com/py-econometrics/pyfixest/issues/957).
 
 ```{python}
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 import pyfixest as pf
@@ -53,4 +55,31 @@ alpha_fit, beta_fit
 ```{python}
 fit = pf.feols("childHeight ~ midparentHeight", data=galton)
 fit.coef()
+```
+
+## Galton's Regression Plot
+
+The book plots the data with the fitted line. Like the book, we jitter the children's heights a little, because many heights repeat and the points would sit on top of each other. A fixed seed makes the plot the same on every render.
+
+```{python}
+rng = np.random.default_rng(957)
+# similar to R's jitter(): move each height by a small random amount
+y_jitter = y + rng.uniform(-0.1, 0.1, size=len(y))
+
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.scatter(x, y_jitter, s=4, color="grey")
+ax.scatter(center_x, center_y, color="black")
+x_line = np.array([x.min(), x.max()])
+ax.plot(x_line, alpha_fit + beta_fit * x_line, color="black", alpha=0.6)
+ax.text(
+    0.95,
+    0.05,
+    f"fitted line: y={alpha_fit:.2f}+{beta_fit:.2f}x",
+    transform=ax.transAxes,
+    ha="right",
+)
+ax.set_xlabel("midparentHeight")
+ax.set_ylabel("childHeight")
+ax.set_title("Galton's regression")
+plt.show()
 ```
